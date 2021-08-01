@@ -17,5 +17,10 @@ from django.contrib import admin
 from django.urls import path
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('', admin.site.urls),
 ]
+
+app_name = "root"
+admin.site.site_header = "Family Enterprises"
+admin.site.site_title = "Family Enterprises Accounting"
+admin.site.index_title = "Welcome to Family Enterprises"
