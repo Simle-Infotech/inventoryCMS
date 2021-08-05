@@ -6,7 +6,7 @@ SOCKFILE=/media/main_storage/anupadkh/run/inventory.sock        # we will commun
 USER=anupadkh                                       # the user to run as (*)
 GROUP=anupadkh                                    # the group to run as (*)
 NUM_WORKERS=1                                     # how many worker processes should Gunicorn spawn (*)
-DJANGO_SETTINGS_MODULE=fEN.settings             # which settings file should Django use (*)
+DJANGO_SETTINGS_MODULE=fEN.prod             # which settings file should Django use (*)
 DJANGO_WSGI_MODULE=fEN.wsgi                     # WSGI module name (*)
 VENV_DIR=/media/main_storage/anupadkh/venv_inventory                      #VirtualEnv directory
 
