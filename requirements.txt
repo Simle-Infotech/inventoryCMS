@@ -11,3 +11,4 @@ snowballstemmer==2.1.0
 sqlparse==0.4.1
 django-inline-actions
 django-jazzmin
+gunicorn
