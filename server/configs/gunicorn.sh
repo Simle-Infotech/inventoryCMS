@@ -8,7 +8,7 @@ GROUP=anupadkh                                    # the group to run as (*)
 NUM_WORKERS=1                                     # how many worker processes should Gunicorn spawn (*)
 DJANGO_SETTINGS_MODULE=fEN.settings             # which settings file should Django use (*)
 DJANGO_WSGI_MODULE=fEN.wsgi                     # WSGI module name (*)
-VENV_DIR=/media/main_storage/anupadkh/fEN                      #VirtualEnv directory
+VENV_DIR=/media/main_storage/anupadkh/venv_inventory                      #VirtualEnv directory
 
 echo "Starting $NAME as `whoami`"
 
