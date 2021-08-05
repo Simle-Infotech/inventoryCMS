@@ -1,1 +1,1 @@
-sudo supervisorctl restart portal
+sudo supervisorctl restart fEN
