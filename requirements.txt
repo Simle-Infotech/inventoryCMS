@@ -20,3 +20,4 @@ knox
 cryptography
 jinja2
 boto3
+django-rest-knox

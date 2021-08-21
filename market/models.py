@@ -1,5 +1,8 @@
-from django.db import models
 
+from django.db.models import Sum, Q, F, Value
+from django.db import models
+from django.conf import settings
+from django.core.exceptions import ValidationError
 
 class ShoppingCart(models.Model):
     # order = models.ForeignKey('market.MarketOrder', on_delete=models.CASCADE)
@@ -18,6 +21,43 @@ class ShoppingCart(models.Model):
         else:
             return "%s : Cart" % (self.id)
     
+    @property
+    def total(self):
+        items = self.shoppingitems_set.all()
+        mytotal = 0
+        # Tax Included and Tax Excluded Items (Rate * Quantity)
+        tax_inc_items = items.filter(Q(Q(taxable = True) & Q(tax_included = True)) | Q(taxable=False))
+        if tax_inc_items.count()>0:
+            mytotal += tax_inc_items.aggregate(
+                total = Sum(F('price') * F('qty'))
+            )['total']
+        tax = items.filter(taxable=True)
+        if tax.count()>0:
+            mytotal += tax.aggregate(
+                total = Sum(F('price') * F('qty') * Value(settings.TOTAL_WITH_TAX))
+            )['total']
+        
+        return mytotal
+    
+    @property
+    def total_tax(self):
+        items = self.shoppingitems_set.all()
+        mytotal = 0
+        # Tax Included Items
+        tax_inc_items = items.filter(Q(Q(taxable = True) & Q(tax_included = True)))
+        if tax_inc_items.count()>0:
+            mytotal += tax_inc_items.aggregate(
+                total = Sum(F('price') * F('qty'))
+            )['total'] / settings.TOTAL_WITH_TAX * settings.TAX
+
+        tax = items.filter(taxable=True) 
+        if tax.count()>0:
+            mytotal += tax.aggregate(
+                total = Sum(F('price') * F('qty'))
+            )['total'] * settings.TAX
+        
+        return mytotal
+
     class Meta:
         ordering = ('-paid_status',)
 
@@ -29,3 +69,15 @@ class ShoppingItems(models.Model):
     price = models.FloatField('Rate', default=0)
     taxable = models.BooleanField(default=True)
     tax_included = models.BooleanField(default=False)
+
+    # def clean(self, *args, **kwargs):
+    #     if self.cart.paid_status == 1:
+    #         super(ShoppingItems, self).clean(*args, **kwargs)
+    #     else:
+    #         raise ValidationError('Item has already been paid for')
+    
+    # def delete(self, *args, **kwargs):
+    #     if self.cart.paid_status == 1:
+    #         raise ValidationError('Item has already been paid for')
+    #     else:
+    #         super(ShoppingItems, self).delete(*args, **kwargs)
