@@ -54,7 +54,6 @@ class ItemsCartAdmin(admin.TabularInline):
 @admin.register(apps.get_model('market', model_name='ShoppingCart'))
 class ShoppingCartAdmin(admin.ModelAdmin):
     model = apps.get_model('market', model_name='ShoppingCart')
-    exclude = ['customer', 'paid_status']
     list_display = ['__str__','customer', 'paid_status', 'total']
     inlines = [ItemsCartAdmin, ]
     readonly_fields = ['total', 'total_tax']
@@ -64,10 +63,11 @@ class ShoppingCartAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
             self.exclude = ['customer',]
-            self.list_filter = ['customer', 'paid_status']
+            self.list_filter = ['customer', 'paid_status', 'total']
             return qs
         else:
             self.list_display = ['__str__', 'paid_status', 'total']
+            self.exclude = ['customer', 'paid_status']
         return qs.filter(customer=request.user.usertype.belongs_to_customer)
 
     def save_model(self, request, obj, form, change):
