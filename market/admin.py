@@ -34,22 +34,19 @@ class ItemsCartAdmin(admin.TabularInline):
         return super(ItemsCartAdmin, self).get_formset( request, obj, **kwargs)
     
     def has_change_permission(self, request, obj=None):
-        if obj.paid_status != 1:
-            return False
+        if obj != None:
+            if obj.paid_status != 1:
+                return False
+            else:
+                return True
         else:
             return True
     
     def has_add_permission(self, request, obj=None):
-        if obj.paid_status != 1:
-            return False
-        else:
-            return True
+        return self.has_change_permission(request, obj)
 
     def has_delete_permission(self, request, obj):
-        if obj.paid_status != 1:
-            return False
-        else:
-            return True
+        return self.has_change_permission(request, obj)
 
 
 

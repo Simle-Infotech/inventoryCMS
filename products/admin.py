@@ -1,7 +1,7 @@
 from django.apps import apps
 from django.contrib import admin
 
-allowed_list = ['Tags', 'Item', 'Image']
+allowed_list = ['Tags', 'Item', 'Image', "Color", "ItemColorAvailability"]
 
 # for x in apps.get_models():
 #     for r in allowed_list:

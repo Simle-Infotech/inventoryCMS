@@ -40,7 +40,7 @@ class Item(models.Model):
 
 
 class Color(GeneralModel):
-    pass
+    hash_code = models.CharField("Color Code", null=True, max_length=15, blank=True)
 
 
 class ItemColorAvailability(models.Model):
