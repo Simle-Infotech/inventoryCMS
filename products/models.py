@@ -6,7 +6,7 @@ class GeneralModel(models.Model):
 
     def save(self, *args, **kwargs):
         self.name = self.name.lower()
-        super(Tags, self).save(*args, **kwargs)
+        super(GeneralModel, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -31,7 +31,7 @@ class Item(models.Model):
         return self.name
     
     def save(self, *args, **kwargs):
-        self.name = self.name.lower()
+        # self.name = self.name.lower()
         super(Item, self).save(*args, **kwargs)
         if ItemColorAvailability.objects.filter(item=self).count() == 0:
             ItemColorAvailability.objects.create(item=self)
@@ -52,6 +52,9 @@ class ItemColorAvailability(models.Model):
             return "%s:%s" % (self.item.name, self.color)
         else:
             return self.item.name
+    
+    class Meta:
+        unique_together = ['item', 'color']
 
 
 class Image(models.Model):

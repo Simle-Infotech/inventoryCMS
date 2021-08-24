@@ -64,15 +64,18 @@ class ShoppingCartAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             self.exclude = ['customer',]
             self.list_filter = ['customer', 'paid_status', 'total']
+            self.readonly_fields = ['total', 'total_tax']
             return qs
         else:
             self.list_display = ['__str__', 'paid_status', 'total']
             self.exclude = ['customer', 'paid_status']
+            self.readonly_fields = ['total', 'total_tax']
         return qs.filter(customer=request.user.usertype.belongs_to_customer)
 
     def save_model(self, request, obj, form, change):
         if not obj.id:
             obj.customer = request.user.usertype.belongs_to_customer
+        obj.clean()
         obj.save()
     
     # def has_delete_permission(self, request, obj):
