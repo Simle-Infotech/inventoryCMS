@@ -70,6 +70,9 @@ class ShoppingItems(models.Model):
     taxable = models.BooleanField(default=True)
     tax_included = models.BooleanField(default=False)
 
+    class Meta:
+        unique_together = ['cart', 'item']
+
     # def clean(self, *args, **kwargs):
     #     if self.cart.paid_status == 1:
     #         super(ShoppingItems, self).clean(*args, **kwargs)
