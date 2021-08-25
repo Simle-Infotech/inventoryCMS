@@ -62,13 +62,13 @@ class ShoppingCartAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
-            self.exclude = ['customer',]
+            self.exclude = ['cart_created',]
             self.list_filter = ['customer', 'paid_status', 'total']
             self.readonly_fields = ['total', 'total_tax']
             return qs
         else:
             self.list_display = ['__str__', 'paid_status', 'total']
-            self.exclude = ['customer', 'paid_status']
+            self.exclude = ['customer', 'paid_status', 'cart_created']
             self.readonly_fields = ['total', 'total_tax']
         return qs.filter(customer=request.user.usertype.belongs_to_customer)
 

@@ -1,4 +1,3 @@
-
 from django.db.models import Sum, Q, F, Value
 from django.db import models
 from django.conf import settings
@@ -11,11 +10,13 @@ class ShoppingCart(models.Model):
         (1, "Unpaid"),
         (2, "Paid in Cash"),
         (3, "Paid in Cheque"),
-        (4, "Free Distribution")
+        (4, "Free Distribution"),
+        (5, "Marked for Delivery")
     ), default=1)
     description = models.TextField(blank=True, null=True)
     total = models.FloatField(default=0.0)
     total_tax = models.FloatField(default=0.0)
+    cart_created = models.DateTimeField(auto_now_add=True )
 
     def __str__(self):
         if self.description != "":
