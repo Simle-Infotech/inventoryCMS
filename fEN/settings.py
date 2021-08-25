@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'users',
     'knox',
     'rest_framework',
+
+    'easy_select2',
 ]
 
 MIDDLEWARE = [

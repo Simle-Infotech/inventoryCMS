@@ -21,3 +21,5 @@ cryptography
 jinja2
 boto3
 django-rest-knox
+django-select2
+django-easy-select2
