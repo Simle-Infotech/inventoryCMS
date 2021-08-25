@@ -14,6 +14,8 @@ class ShoppingCart(models.Model):
         (4, "Free Distribution")
     ), default=1)
     description = models.TextField(blank=True, null=True)
+    total = models.FloatField(default=0.0)
+    total_tax = models.FloatField(default=0.0)
 
     def __str__(self):
         if self.description != "":
@@ -21,8 +23,13 @@ class ShoppingCart(models.Model):
         else:
             return "%s : Cart" % (self.id)
     
+    def save(self, *args, **kwargs):
+        self.total = self.get_total
+        self.total_tax = self.get_total_tax
+        super(ShoppingCart, self).save(*args, **kwargs)
+    
     @property
-    def total(self):
+    def get_total(self):
         items = self.shoppingitems_set.all()
         mytotal = 0
         # Tax Included and Tax Excluded Items (Rate * Quantity)
@@ -40,7 +47,7 @@ class ShoppingCart(models.Model):
         return mytotal
     
     @property
-    def total_tax(self):
+    def get_total_tax(self):
         items = self.shoppingitems_set.all()
         mytotal = 0
         # Tax Included Items
