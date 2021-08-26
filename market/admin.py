@@ -34,7 +34,9 @@ class ItemsCartAdmin(admin.TabularInline):
         return super(ItemsCartAdmin, self).get_formset( request, obj, **kwargs)
     
     def has_change_permission(self, request, obj=None):
-        if obj != None:
+        if request.user.is_superuser:
+            return True
+        if obj is not None:
             if obj.paid_status != 1:
                 return False
             else:
@@ -56,14 +58,14 @@ class ShoppingCartAdmin(admin.ModelAdmin):
     model = apps.get_model('market', model_name='ShoppingCart')
     exclude = ['customer', 'paid_status', 'cart_created', 'description', 'total', 'total_tax']
     inlines = [ItemsCartAdmin, ]
-    # readonly_fields = ['total', 'total_tax']
-
+    jazzmin_section_order = ("ItemsCartAdmin", "general",)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
-            self.exclude = ['cart_created',]
-            self.list_filter = ['customer', 'paid_status', 'total']
+            self.exclude = []
+            self.list_filter = ['customer', 'paid_status']
+            self.list_display = ['customer', 'paid_status', 'total']
             self.readonly_fields = ['total', 'total_tax']
             return qs
         else:
