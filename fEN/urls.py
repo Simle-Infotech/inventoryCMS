@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 
 
@@ -23,6 +23,7 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 
 from accounts import api
+from notifications import urls as notifications_urls
 
 urlpatterns = [
     path('api/', include('rest_framework.urls', namespace='rest_framework')),
@@ -30,6 +31,7 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('others/', include(router.urls)),
     path('data', api.generalModelViewSet.as_view()),
+    re_path('^inbox/notifications/', include(notifications_urls, namespace='notifications')),
 ] 
 
 router.register(r'images', api.ImageViewSet)

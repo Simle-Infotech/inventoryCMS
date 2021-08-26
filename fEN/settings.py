@@ -47,9 +47,10 @@ INSTALLED_APPS = [
     'market',
     'products',
     'users',
+
     'knox',
     'rest_framework',
-
+    'notifications',
     # 'easy_select2',
 ]
 
@@ -157,3 +158,22 @@ REST_FRAMEWORK = {
 
 TOTAL_WITH_TAX = 1.13
 TAX = .13
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join('..',BASE_DIR, 'logger.txt'),
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

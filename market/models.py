@@ -2,17 +2,24 @@ from django.db.models import Sum, Q, F, Value
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+import logging
+from django.forms.models import model_to_dict
+logger = logging.getLogger('Shopping.cart')
+from notifications.signals import notify
+from django.contrib.auth.models import User
+
 
 class ShoppingCart(models.Model):
     # order = models.ForeignKey('market.MarketOrder', on_delete=models.CASCADE)
     customer = models.ForeignKey('accounts.Customer', on_delete=models.SET_NULL, null=True, blank=True)
-    paid_status = models.IntegerField(choices=(
+    paid_choices = (
         (1, "Unpaid"),
         (2, "Paid in Cash"),
         (3, "Paid in Cheque"),
         (4, "Free Distribution"),
         (5, "Marked for Delivery")
-    ), default=1)
+    )
+    paid_status = models.IntegerField(choices=paid_choices, default=1)
     description = models.TextField(blank=True, null=True)
     total = models.FloatField(default=0.0)
     total_tax = models.FloatField(default=0.0)
@@ -27,7 +34,21 @@ class ShoppingCart(models.Model):
     def save(self, *args, **kwargs):
         self.total = self.get_total
         self.total_tax = self.get_total_tax
-        super(ShoppingCart, self).save(*args, **kwargs)
+        logger.info(str(model_to_dict(self)))
+        if self.paid_status != 1:
+            notify.send(sender=User.objects.filter(is_superuser=True).first() ,recipient=self.customer.usertype_set.get().user, target=self, verb="Order", description=dict(self.paid_choices)[self.paid_status])
+            super(ShoppingCart, self).save(*args, **kwargs)
+            return True
+        
+        if getattr(self, 'id', False):
+            super(ShoppingCart, self).save(*args, **kwargs)
+            notify.send(self.customer.usertype_set.get().user, recipient=User.objects.filter(is_superuser=True), verb="Order", description="Order Modified %s " % self.id, target=self)
+        else:
+            super(ShoppingCart, self).save(*args, **kwargs)
+            notify.send(self.customer.usertype_set.get().user, recipient=User.objects.filter(is_superuser=True), verb="Order", description="Order Created %s " % self.customer.name, target=self)
+            
+        return True
+
     
     @property
     def get_total(self):
@@ -67,7 +88,7 @@ class ShoppingCart(models.Model):
         return mytotal
 
     class Meta:
-        ordering = ('-paid_status',)
+        ordering = ('-cart_created','-paid_status',)
 
 
 class ShoppingItems(models.Model):
@@ -78,17 +99,9 @@ class ShoppingItems(models.Model):
     taxable = models.BooleanField(default=True)
     tax_included = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        logger.info(str(model_to_dict(self)))
+        super(ShoppingItems, self).save(*args, **kwargs)
+
     class Meta:
         unique_together = ['cart', 'item']
-
-    # def clean(self, *args, **kwargs):
-    #     if self.cart.paid_status == 1:
-    #         super(ShoppingItems, self).clean(*args, **kwargs)
-    #     else:
-    #         raise ValidationError('Item has already been paid for')
-    
-    # def delete(self, *args, **kwargs):
-    #     if self.cart.paid_status == 1:
-    #         raise ValidationError('Item has already been paid for')
-    #     else:
-    #         super(ShoppingItems, self).delete(*args, **kwargs)
