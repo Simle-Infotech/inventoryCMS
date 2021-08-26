@@ -49,7 +49,7 @@ class ItemColorAvailability(models.Model):
 
     def __str__(self):
         if self.color:
-            return "%s:%s" % (self.item.name, self.color)
+            return "%s:%s" % (self.color, self.item.name)
         else:
             return self.item.name
     
