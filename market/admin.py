@@ -54,9 +54,9 @@ class ItemsCartAdmin(admin.TabularInline):
 @admin.register(apps.get_model('market', model_name='ShoppingCart'))
 class ShoppingCartAdmin(admin.ModelAdmin):
     model = apps.get_model('market', model_name='ShoppingCart')
-    list_display = ['__str__','customer', 'paid_status', 'total']
+    exclude = ['customer', 'paid_status', 'cart_created', 'description', 'total', 'total_tax']
     inlines = [ItemsCartAdmin, ]
-    readonly_fields = ['total', 'total_tax']
+    # readonly_fields = ['total', 'total_tax']
 
 
     def get_queryset(self, request):
@@ -67,8 +67,8 @@ class ShoppingCartAdmin(admin.ModelAdmin):
             self.readonly_fields = ['total', 'total_tax']
             return qs
         else:
-            self.list_display = ['__str__', 'paid_status', 'total']
-            self.exclude = ['customer', 'paid_status', 'cart_created']
+            self.list_display = ['cart_created','__str__', 'paid_status', 'total']
+            self.exclude = ['customer', 'paid_status', 'cart_created', 'description', 'total', 'total_tax']
             self.readonly_fields = ['total', 'total_tax']
         return qs.filter(customer=request.user.usertype.belongs_to_customer)
 
