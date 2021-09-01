@@ -70,8 +70,8 @@ function generateTableRow() {
 	selects = '<span></span>'
 
 	emptyColumn.innerHTML = '<td><a class="cut">-</a><span contenteditable></span></td>' +
-    '<td class="right">' + selects + '</td>' +
-    '<td class="right"><span contenteditable></span></td>' +
+    '<td class="right" style="visibility:hidden; display:none;">' + selects + '</td>' +
+    '<td class="left"><span contenteditable></span></td>' +
 	'<td class="right"><span data-prefix>रु</span><span contenteditable>0.00</span></td>' +
 	'<td class="right"><span contenteditable>1</span></td>' +
 	'<td class="right"><span data-prefix>रु</span><span></span></td>' +
@@ -156,9 +156,10 @@ function updateInvoice() {
     }
 		// set row total
 		cells[4 + j].innerText = price.toFixed(2);
-		debugger;
+		// debugger;
 		items_obj.push(
 			{
+				"product": cells[j].innerText,
 				"description":  cells[j+1].innerText,
 				"rate":  parseFloatHTML(cells[j + 2]),
 				"qty":  parseFloatHTML(cells[j + 3]),

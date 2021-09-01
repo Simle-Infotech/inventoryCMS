@@ -45,12 +45,13 @@ class purchaseInvoice(InvoiceMeta):
 
 
 class ItemsMeta(models.Model):
-    product = models.ForeignKey('products.ItemColorAvailability', on_delete=models.CASCADE)
+    product = models.ForeignKey('products.ItemColorAvailability', on_delete=models.CASCADE, null=True, blank=True)
     description = models.CharField('Description', max_length=300, null=True, blank=True)
-    qty = models.FloatField(null=True, blank=True)
     rate = models.FloatField(null=True, blank=True)
+    qty = models.FloatField(null=True, blank=True)
+    price = models.FloatField(null=True, blank=True)
     taxable = models.BooleanField(default=False)
-    taxInc = models.BooleanField("Included Tax", default = True)
+    tax_include = models.BooleanField("Included Tax", default = True)
     expiryDate = models.DateField("Expiry Date", null=True, blank=True)
     entry_date = models.DateField(auto_now=True, null=True, blank=True)
 

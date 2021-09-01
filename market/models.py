@@ -96,8 +96,8 @@ class ShoppingItems(models.Model):
     qty = models.IntegerField('Quantity')
     cart = models.ForeignKey('market.ShoppingCart', on_delete=models.CASCADE)
     price = models.FloatField('Rate', default=0)
-    # taxable = models.BooleanField(default=True)
-    # tax_included = models.BooleanField(default=False)
+    taxable = models.BooleanField(default=True)
+    tax_included = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         logger.info(str(model_to_dict(self)))

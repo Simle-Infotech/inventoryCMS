@@ -53,7 +53,7 @@
 				// 	inputs[i].nepaliDatePicker();
 				// }
 				{% if unsaved == False %} if (window.print()){
-					location.replace("{% url 'invoices:index_id' id=invoice.id %}");
+					location.replace("{% url 'invoice:invoice_id' id=invoice.id %}");
 				};
 				{% endif %}
 			}
@@ -61,10 +61,11 @@
 				convert();
 				invoice = document.getElementById("invoice");
 
-				invoice_details = JSON.parse(invoice.value)
+				invoice_details = JSON.parse(invoice.value);
 				invoice_details['vat'] = document.getElementById("vat_no").value
 				invoice_details['date'] = document.getElementById("engdate").value
 				invoice_details['notes'] = document.getElementById("notes").innerHTML
+				invoice_details['order_id'] = document.getElementById("order_id").value
 				invoice.value = JSON.stringify(invoice_details)
 
 
@@ -82,7 +83,7 @@
 				<p>Billed By: {{user.first_name }} {{user.last_name}}</p>
 				{% endif %}
 			</address>
-			<form action="" id="form" method="post">
+			<form action="{% url 'invoice:order_id' order_id=order.id %}" id="form" method="post">
 				<input type="hidden" name="items" id="items" />
 				<input type="hidden" name="invoice" id="invoice" />
 				{% csrf_token %}
@@ -111,6 +112,7 @@
 						<button onclick="convert()">EngDate</button>
 						{% endif%}</td>
 				</tr>
+				<input id="order_id" type="hidden" value={{order.id}}>
 				<tr>
 					<th><span contenteditable>Vat Bill No.</span></th>
 					<td colspan="2"><input id="vat_no" value="{{invoice.vat_bill_no | default_if_none:''}}" /></td>
@@ -124,8 +126,8 @@
 				<thead>
 					<tr>
 						<th width="20"><span contenteditable>N</span></th>
-						<th width="150"><span contenteditable>Item Description</span></th>
-                        <th width="200"><span contenteditable>Other Description</span></th>
+						<th width="150" style="visibility:hidden; display:none;"><span contenteditable>Item Description</span></th>
+                        <th width="350"><span contenteditable>Description</span></th>
 						<th width="60"><span contenteditable>Rate</span></th>
 						<th width="60"><span contenteditable>QTY</span></th>
 						<th width="90"><span contenteditable>Price</span></th>
@@ -135,11 +137,12 @@
 					</tr>
 				</thead>
 				<tbody>
+				{% if invoice.id %}
 					{% for item in items %}
 					<tr>
 						<td><span contenteditable>1</span></td>
-						<td><span class="selector" id="sel_{{item.id}}" value="{{item.item_id}}"></span></td>
-                        <td class="left"><span contenteditable>{{item.item}}</span></td>
+						<td style="visibility:hidden; display:none;"><span class="selector" id="sel_{{item.id}}" value="{{item.item_id}}">{{item.item.id}}</span></td>
+                        <td class="left"><span contenteditable>{{item.description}}</span></td>
 						<td class="right"><span data-prefix>रु</span><span contenteditable>{{item.rate |floatformat }}</span></td>
 						<td class="right"><span contenteditable>{{item.qty|floatformat }}</span></td>
 						<td class="right"><span data-prefix>रु</span><span>{{item.price|floatformat }}</span></td>
@@ -148,6 +151,22 @@
 						<td width="0" style="visibility:hidden; display:none"><span>{{item.id}}</span></td>
 					</tr>
 					{% endfor %}
+				{% else %}
+				{% for item in items %}
+					<tr>
+						<td><span contenteditable>1</span></td>
+						<td style="visibility:hidden; display:none;"><span class="selector" id="sel_{{item.id}}" value="{{item.item_id}}">{{item.item.id}}</span></td>
+                        <td class="left"><span contenteditable>{{item.item}}</span></td>
+						<td class="right"><span data-prefix>रु</span><span contenteditable>{{item.rate |floatformat }}</span></td>
+						<td class="right"><span contenteditable>{{item.qty|floatformat }}</span></td>
+						<td class="right"><span data-prefix>रु</span><span>{{item.price|floatformat }}</span></td>
+						<td class="center"><span contenteditable>{% if item.taxable %}x{% endif %}</span></td>
+						<td class="center"><span contenteditable>{% if item.tax_include %}x{% endif %}</span></td>
+						<td width="0" style="visibility:hidden; display:none"><span></span></td>
+					</tr>
+					{% endfor %}
+				
+				{% endif %}
 				</tbody>
 			</table>
 			<a class="add">+</a>

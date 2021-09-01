@@ -30,7 +30,7 @@ from django.urls import reverse, resolve
 class ItemsCartAdmin(admin.TabularInline):
     model = apps.get_model('market', model_name="ShoppingItems")
     show_change_link = True
-    exclude = ('price', )
+    exclude = ('price', 'taxable', 'tax_included' )
     extra = 1
 
     def get_formset(self, request, obj=None, **kwargs):
