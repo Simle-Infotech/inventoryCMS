@@ -21,8 +21,8 @@ class ShoppingCart(models.Model):
     )
     paid_status = models.IntegerField(choices=paid_choices, default=1)
     description = models.TextField(blank=True, null=True)
-    total = models.FloatField(default=0.0)
-    total_tax = models.FloatField(default=0.0)
+    # total = models.FloatField(default=0.0)
+    # total_tax = models.FloatField(default=0.0)
     cart_created = models.DateTimeField(auto_now_add=True )
 
     def __str__(self):
@@ -32,9 +32,9 @@ class ShoppingCart(models.Model):
             return "%s : Cart" % (self.id)
     
     def save(self, *args, **kwargs):
-        self.total = self.get_total
-        self.total_tax = self.get_total_tax
-        logger.info(str(model_to_dict(self)))
+        # self.total = self.get_total
+        # self.total_tax = self.get_total_tax
+        # logger.info(str(model_to_dict(self)))
         if self.paid_status != 1:
             notify.send(sender=User.objects.filter(is_superuser=True).first() ,recipient=self.customer.usertype_set.get().user, target=self, verb="Order", description=dict(self.paid_choices)[self.paid_status])
             super(ShoppingCart, self).save(*args, **kwargs)
@@ -50,42 +50,42 @@ class ShoppingCart(models.Model):
         return True
 
     
-    @property
-    def get_total(self):
-        items = self.shoppingitems_set.all()
-        mytotal = 0
-        # Tax Included and Tax Excluded Items (Rate * Quantity)
-        tax_inc_items = items.filter(Q(Q(taxable = True) & Q(tax_included = True)) | Q(taxable=False))
-        if tax_inc_items.count()>0:
-            mytotal += tax_inc_items.aggregate(
-                total = Sum(F('price') * F('qty'))
-            )['total']
-        tax = items.filter(taxable=True)
-        if tax.count()>0:
-            mytotal += tax.aggregate(
-                total = Sum(F('price') * F('qty') * Value(settings.TOTAL_WITH_TAX))
-            )['total']
+    # @property
+    # def get_total(self):
+    #     items = self.shoppingitems_set.all()
+    #     mytotal = 0
+    #     # Tax Included and Tax Excluded Items (Rate * Quantity)
+    #     tax_inc_items = items.filter(Q(Q(taxable = True) & Q(tax_included = True)) | Q(taxable=False))
+    #     if tax_inc_items.count()>0:
+    #         mytotal += tax_inc_items.aggregate(
+    #             total = Sum(F('price') * F('qty'))
+    #         )['total']
+    #     tax = items.filter(taxable=True)
+    #     if tax.count()>0:
+    #         mytotal += tax.aggregate(
+    #             total = Sum(F('price') * F('qty') * Value(settings.TOTAL_WITH_TAX))
+    #         )['total']
         
-        return mytotal
+    #     return mytotal
     
-    @property
-    def get_total_tax(self):
-        items = self.shoppingitems_set.all()
-        mytotal = 0
-        # Tax Included Items
-        tax_inc_items = items.filter(Q(Q(taxable = True) & Q(tax_included = True)))
-        if tax_inc_items.count()>0:
-            mytotal += tax_inc_items.aggregate(
-                total = Sum(F('price') * F('qty'))
-            )['total'] / settings.TOTAL_WITH_TAX * settings.TAX
+    # @property
+    # def get_total_tax(self):
+    #     items = self.shoppingitems_set.all()
+    #     mytotal = 0
+    #     # Tax Included Items
+    #     tax_inc_items = items.filter(Q(Q(taxable = True) & Q(tax_included = True)))
+    #     if tax_inc_items.count()>0:
+    #         mytotal += tax_inc_items.aggregate(
+    #             total = Sum(F('price') * F('qty'))
+    #         )['total'] / settings.TOTAL_WITH_TAX * settings.TAX
 
-        tax = items.filter(taxable=True) 
-        if tax.count()>0:
-            mytotal += tax.aggregate(
-                total = Sum(F('price') * F('qty'))
-            )['total'] * settings.TAX
+    #     tax = items.filter(taxable=True) 
+    #     if tax.count()>0:
+    #         mytotal += tax.aggregate(
+    #             total = Sum(F('price') * F('qty'))
+    #         )['total'] * settings.TAX
         
-        return mytotal
+    #     return mytotal
 
     class Meta:
         ordering = ('-cart_created','-paid_status',)
@@ -96,8 +96,8 @@ class ShoppingItems(models.Model):
     qty = models.IntegerField('Quantity')
     cart = models.ForeignKey('market.ShoppingCart', on_delete=models.CASCADE)
     price = models.FloatField('Rate', default=0)
-    taxable = models.BooleanField(default=True)
-    tax_included = models.BooleanField(default=False)
+    # taxable = models.BooleanField(default=True)
+    # tax_included = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         logger.info(str(model_to_dict(self)))

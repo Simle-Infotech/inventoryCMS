@@ -8,3 +8,4 @@ class UserType(models.Model):
     # nep_name = models.CharField("युजरको किसिम, नेपालीमा", max_length=300)
     # description = models.TextField(blank=True, null=True)
     belongs_to_customer = models.ForeignKey('accounts.Customer', on_delete=models.SET_NULL, null=True, blank=True)
+    belongs_to_dealer = models.ForeignKey('accounts.Dealer', on_delete=models.SET_NULL, null=True, blank=True)

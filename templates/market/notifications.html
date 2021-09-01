@@ -1,0 +1,13 @@
+{% extends 'admin/index.html' %}
+{% load i18n static jazzmin admin_urls %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+{% get_jazzmin_settings request as jazzmin_settings %}
+
+{% block sidebar %}
+{{block.super}}
+{% endblock %}
+
+{% block content %}
+hello Dude
+{% endblock content %}

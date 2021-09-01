@@ -1,6 +1,7 @@
 from django.db import models
 from nepali_date import NepaliDate
 from django.db.models import Q
+from django.contrib.auth.models import User
 
 
 class PaymentMeta(models.Model):

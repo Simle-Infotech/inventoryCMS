@@ -1,0 +1,194 @@
+
+<html> {% load static %}
+	<head>
+		<meta charset="utf-8">
+		<title>Invoice</title>
+		<link rel="stylesheet" href="{% static 'css/style.css' %}">
+		<link rel="license" href="https://www.opensource.org/licenses/mit-license/">
+		<link href="{% static 'css/nepali.datepicker.v3.2.min.css' %}" rel="stylesheet" type="text/css"/>
+	</head>
+	<body>
+		<script type="text/javascript">
+            var items_list = JSON.parse('{{items_list | safe}}');
+
+			function convert(){
+				console.log("registered Change");
+				var input = document.getElementById('nepali-datepicker');
+				nep_date_obj = {
+					"year": parseInt(input.value.split('-')[0]),
+					"month": parseInt(input.value.split('-')[1]),
+					"day": parseInt(input.value.split('-')[2])
+				}
+				var eng_place = document.getElementById('engdate');
+				eng_place.value = NepaliFunctions.ConvertDateFormat( NepaliFunctions.BS2AD(nep_date_obj));
+			}
+			window.onload = function() {
+				// var inputs = document.getElementsByClassName('nepali-datepicker');
+				var input = document.getElementById('nepali-datepicker');
+				input.nepaliDatePicker();
+				today = NepaliFunctions.GetCurrentBsDate();
+				var eng_place = document.getElementById('engdate');
+				var date_system = "{{ invoice.date | date:'Y-m-d' | default_if_none:''}}";
+				{% if invoice.date %}
+				if (date_system !== ""){
+					today = NepaliFunctions.AD2BS({
+						"year": {{invoice.date | date:'Y'}},
+						"month": {{invoice.date | date:'m'}},
+						"day":{{invoice.date | date:'d'}}
+					});
+				}
+				{% endif %}
+				if (input.value == "" & eng_place.value == ""){
+					input.value = NepaliFunctions.ConvertDateFormat(today);
+				}
+				nep_date_obj = {
+					"year": parseInt(input.value.split('-')[0]),
+					"month": parseInt(input.value.split('-')[1]),
+					"day": parseInt(input.value.split('-')[2])
+				}
+				var eng_place = document.getElementById('engdate');
+				eng_place.value = NepaliFunctions.ConvertDateFormat( NepaliFunctions.BS2AD(nep_date_obj));
+
+				// for (var i = 0; i < inputs.length; i++) {
+				// 	inputs[i].nepaliDatePicker();
+				// }
+				{% if unsaved == False %} if (window.print()){
+					location.replace("{% url 'invoices:index_id' id=invoice.id %}");
+				};
+				{% endif %}
+			}
+			function beforeSubmit(){
+				convert();
+				invoice = document.getElementById("invoice");
+
+				invoice_details = JSON.parse(invoice.value)
+				invoice_details['vat'] = document.getElementById("vat_no").value
+				invoice_details['date'] = document.getElementById("engdate").value
+				invoice_details['notes'] = document.getElementById("notes").innerHTML
+				invoice.value = JSON.stringify(invoice_details)
+
+
+				document.getElementById("form").submit();
+				return true;
+			}
+		</script>
+		<header>
+			<h1><a href="{% url 'admin:accounts_customer_change' object_id=customer.id %}">Invoice</a></h1>
+			<address contenteditable>
+				<p>{{owner.name | default_if_none:''}}</p>
+				<p>{{owner.address | default_if_none:''}}, Contact No.:{{owner.phone | default_if_none:''}}, Email: {{owner.email | default_if_none:''}}</p>
+				<p>PAN:{{owner.pan | default_if_none:''}}</p>
+				{% if owner.contact_person %}
+				<p>Billed By: {{user.first_name }} {{user.last_name}}</p>
+				{% endif %}
+			</address>
+			<form action="" id="form" method="post">
+				<input type="hidden" name="items" id="items" />
+				<input type="hidden" name="invoice" id="invoice" />
+				{% csrf_token %}
+				{% if unsaved %} <button style="color:red; background-color: black; padding: 5px;" onclick="beforeSubmit();" type="button">Save & Print</button> <span>Max Items in Bill: 20</span> {% endif %}
+			</form>
+			<!-- <span><img alt="" src="http://www.jonathantneal.com/examples/invoice/logo.png"><input type="file" accept="image/*"></span> -->
+		</header>
+		<article>
+			<h1>Recipient</h1>
+			<address contenteditable>
+				<p>{{customer.name | default_if_none:''}}<br>c/o{% if customer.contact_person %} {{customer.contact_person.name}} {% endif %}</p>
+				<p>{{customer.address | default_if_none:''}}</p>
+				<p>{{customer.phone | default_if_none:''}}</p>
+				<p>PAN:{{customer.pan | default_if_none:''}}</p>
+			</address>
+			<table class="meta">
+				<tr>
+					<th><span contenteditable>Invoice #</span></th>
+					<td colspan="2"><span contenteditable>{{invoice.id}}</span></td>
+				</tr>
+				<tr>
+					<th><span contenteditable>Date</span></th>
+
+					<td><input id="nepali-datepicker" onchange="convert();" /></td>
+					<td><input id="engdate"/>{% if unsaved %}
+						<button onclick="convert()">EngDate</button>
+						{% endif%}</td>
+				</tr>
+				<tr>
+					<th><span contenteditable>Vat Bill No.</span></th>
+					<td colspan="2"><input id="vat_no" value="{{invoice.vat_bill_no | default_if_none:''}}" /></td>
+				</tr>
+				<tr>
+					<th><span contenteditable>Due Amount</span></th>
+					<td colspan="2"><span id="prefix" contenteditable>रु</span><span>{{due}}</span></td>
+				</tr>
+			</table>
+			<table class="inventory">
+				<thead>
+					<tr>
+						<th width="20"><span contenteditable>N</span></th>
+						<th width="150"><span contenteditable>Item Description</span></th>
+                        <th width="200"><span contenteditable>Other Description</span></th>
+						<th width="60"><span contenteditable>Rate</span></th>
+						<th width="60"><span contenteditable>QTY</span></th>
+						<th width="90"><span contenteditable>Price</span></th>
+						<th width="15"><span contenteditable>Tax</span></th>
+						<th width="15"><span contenteditable>Inc</span></th>
+						<th width="0" style="visibility: hidden; display:none"></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in items %}
+					<tr>
+						<td><span contenteditable>1</span></td>
+						<td><span class="selector" id="sel_{{item.id}}" value="{{item.item_id}}"></span></td>
+                        <td class="left"><span contenteditable>{{item.item}}</span></td>
+						<td class="right"><span data-prefix>रु</span><span contenteditable>{{item.rate |floatformat }}</span></td>
+						<td class="right"><span contenteditable>{{item.qty|floatformat }}</span></td>
+						<td class="right"><span data-prefix>रु</span><span>{{item.price|floatformat }}</span></td>
+						<td class="center"><span contenteditable>{% if item.taxable %}x{% endif %}</span></td>
+						<td class="center"><span contenteditable>{% if item.tax_include %}x{% endif %}</span></td>
+						<td width="0" style="visibility:hidden; display:none"><span>{{item.id}}</span></td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<a class="add">+</a>
+			<table class="balance">
+				<tr>
+					<th><span contenteditable>Total</span></th>
+					<td><span data-prefix>रु</span><span>600.00</span></td>
+				</tr>
+				<tr>
+					<th><span contenteditable>Amount Paid</span></th>
+					<td><span data-prefix>रु</span><span contenteditable>0.00</span></td>
+				</tr>
+				<tr>
+					<th><span contenteditable>TAX 13%</span></th>
+					<td><span data-prefix>रु</span><span>70.00</span></td>
+				</tr>
+				<tr>
+					<th><span contenteditable>Grand Total</span></th>
+					<td><span data-prefix>रु</span><span>600.00</span></td>
+				</tr>
+				<tr>
+					<th><span contenteditable>Discount</span></th>
+					<td><span data-prefix>रु</span><span contenteditable>0.00</span></td>
+				</tr>
+				<tr>
+					<th><span contenteditable>Balance Due</span></th>
+					<td><span data-prefix>रु</span><span>600.00</span></td>
+				</tr>
+			</table>
+		</article>
+		<aside>
+			<h1><span contenteditable>Additional Notes</span></h1>
+			<div contenteditable id="notes">
+				{% if invoice.notes %} {{invoice.notes | safe}} {% else %}1.{% endif %}
+			</div>
+		</aside>
+
+
+
+
+        <script src="{% static 'js/run.js' %}"></script>
+		<script src="{% static 'js/nepali.datepicker.v3.2.min.js' %}" type="text/javascript"></script>
+	</body>
+</html>

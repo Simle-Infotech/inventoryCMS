@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from nepali_date.date import NepaliDate
 
-register_models = []
+register_models = ['Dealer']
 
 # class ContactPersonInline(admin.StackedInline):
 #     model = apps.get_model('accounts', model_name='Person')

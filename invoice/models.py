@@ -20,6 +20,7 @@ class salesInvoice(InvoiceMeta):
     issued_for = models.ForeignKey('accounts.Customer', on_delete=models.CASCADE)
     issued_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True)
     is_posted = models.BooleanField(default=False)
+    order_no = models.ForeignKey('market.ShoppingCart', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         try:
@@ -29,6 +30,11 @@ class salesInvoice(InvoiceMeta):
                 return self.issued_for.name
             except:
                 return self.total
+    
+    def save(self, *args, **kwargs):
+        if self.vat_bill_no != None:
+            self.is_vat = True
+        super(salesInvoice, self).save(*args, **kwargs)
 
 
 class purchaseInvoice(InvoiceMeta):
@@ -39,12 +45,14 @@ class purchaseInvoice(InvoiceMeta):
 
 
 class ItemsMeta(models.Model):
-    product = models.ForeignKey('products.Item', on_delete=models.CASCADE)
-    quantity = models.FloatField()
-    rate = models.FloatField()
+    product = models.ForeignKey('products.ItemColorAvailability', on_delete=models.CASCADE)
+    description = models.CharField('Description', max_length=300, null=True, blank=True)
+    qty = models.FloatField(null=True, blank=True)
+    rate = models.FloatField(null=True, blank=True)
     taxable = models.BooleanField(default=False)
     taxInc = models.BooleanField("Included Tax", default = True)
-    expiryDate = models.DateField("Expiry Date")
+    expiryDate = models.DateField("Expiry Date", null=True, blank=True)
+    entry_date = models.DateField(auto_now=True, null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -52,6 +60,7 @@ class ItemsMeta(models.Model):
 
 class salesItem(ItemsMeta):
     salesInvoice = models.ForeignKey('invoice.salesInvoice', on_delete=models.CASCADE)
+
 
 
 class purchaseItem(ItemsMeta):

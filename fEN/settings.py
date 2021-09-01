@@ -69,7 +69,7 @@ ROOT_URLCONF = 'fEN.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates',],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -177,3 +177,5 @@ LOGGING = {
         },
     },
 }
+
+from .jazzmin_settings import *
