@@ -17,7 +17,7 @@ def invoice(request, order_id=None, id=None, customer_id=None):
         items_list.append({x.id: x.__str__()})
         
     if id is not None:
-        items = Invoices.salesItem.objects.get(salesInvoice__id=id)
+        items = Invoices.salesItem.objects.filter(salesInvoice__id=id)
         invoice = Invoices.salesInvoice.objects.get(id=id)
         customer = invoice.issued_for
         owner = invoice.issued_by.usertype.belongs_to_dealer
