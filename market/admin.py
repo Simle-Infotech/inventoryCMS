@@ -87,6 +87,8 @@ class ShoppingCartAdmin(admin.ModelAdmin):
         obj.save()
     
     def invoice(self, obj):
+        if obj is None:
+            return "Not Ready for Invoice"
         href = "<a href=\"%s\"> Goto Invoice </a>"
         order_invoices = Invoices.salesInvoice.objects.filter(order_no = obj)
         if order_invoices.count() > 0:
