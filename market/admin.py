@@ -61,38 +61,59 @@ class ItemsCartAdmin(admin.TabularInline):
 @admin.register(apps.get_model('market', model_name='ShoppingCart'))
 class ShoppingCartAdmin(admin.ModelAdmin):
     model = apps.get_model('market', model_name='ShoppingCart')
-    exclude = ['customer', 'paid_status', 'cart_created', 'description']
+    # exclude = ['customer', 'paid_status', 'cart_created', 'description']
     inlines = [ItemsCartAdmin, ]
     jazzmin_section_order = ("ItemsCartAdmin", "general",)
+    list_display = ['cart_created','__str__', 'paid_status', ]
+    list_filter = ['paid_status']
+    exclude = []
+
+    def get_exclude(self, request, obj):
+        if not request.user.is_superuser:
+            return ['customer', 'paid_status', 'cart_created', 'description']
+            
+        return self.exclude
+    
+    def get_readonly_fields(self, request, obj):
+        order_invoices = Invoices.salesInvoice.objects.filter(order_no = obj)
+        if order_invoices.count() == 0 and not request.user.is_superuser:
+            return []
+        return ['invoice',]
+        # return excludes
+    
+    def get_list_display(self, request):
+        if request.user.is_superuser:
+            return ['customer', 'paid_status']
+
+        return self.list_display
+    
+    def get_list_filter(self, request):
+        if request.user.is_superuser:
+            return ['customer', 'paid_status']
+
+        return self.list_filter
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
-            self.exclude = []
-            self.list_filter = ['customer', 'paid_status']
-            self.list_display = ['customer', 'paid_status', 'invoice']
-            self.readonly_fields = ['invoice']
             return qs
-        else:
-            self.list_display = ['cart_created','__str__', 'paid_status', ]
-            self.exclude = ['customer', 'paid_status', 'cart_created', 'description']
-            self.list_filter = ['paid_status']
-            # self.readonly_fields = ['total', 'total_tax']
+
         return qs.filter(customer=request.user.usertype.belongs_to_customer)
 
     def save_model(self, request, obj, form, change):
-        if not obj.id:
+        if not obj.id and request.user.is_superuser:
             obj.customer = request.user.usertype.belongs_to_customer
         obj.clean()
         obj.save()
     
     def invoice(self, obj):
-        if obj is None:
+        if obj.id is None:
             return "Not Ready for Invoice"
         href = "<a href=\"%s\"> Goto Invoice </a>"
         order_invoices = Invoices.salesInvoice.objects.filter(order_no = obj)
         if order_invoices.count() > 0:
             return format_html(href % reverse('invoice:invoice_id', kwargs={'id': order_invoices[0].id}))
+        
         
         return format_html(href % reverse('invoice:order_id', kwargs={'order_id':obj.id}))
 

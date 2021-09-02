@@ -13,6 +13,8 @@ def invoice(request, order_id=None, id=None, customer_id=None):
     items = []
     items_list = []
     cart = Markets.ShoppingCart()
+    unsaved = True
+
     for x in items_:
         items_list.append({x.id: x.__str__()})
         
@@ -39,6 +41,9 @@ def invoice(request, order_id=None, id=None, customer_id=None):
         customer = Accounts.Customer.objects.get(id=customer_id)
         owner = Users.UserType.objects.get(user=request.user).belongs_to_dealer
         invoice = Invoices.salesInvoice(issued_for=customer, issued_by=request.user)
+    
+    if not request.user.is_superuser:
+        unsaved = False # Do not allow other customers to edit the invoice.
 
     context = {
         'customer': customer, 
@@ -47,7 +52,7 @@ def invoice(request, order_id=None, id=None, customer_id=None):
         'invoice': invoice,
         'owner': owner,
         'cart': cart,
-        "unsaved": True,
+        "unsaved": unsaved,
         "due" : round(customer.arthik_remaining_pay, 2),
         'order': cart
     }
