@@ -42,6 +42,7 @@ class ItemsCartAdmin(admin.TabularInline):
         if request.user.is_superuser:
             return True
         if obj is not None:
+            # if obj.paid_status != 1 or Invoices.salesInvoice.objects.filter(order_no = obj).count() > 0:
             if obj.paid_status != 1:
                 return False
             else:

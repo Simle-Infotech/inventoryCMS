@@ -74,6 +74,8 @@ def invoice(request, order_id=None, id=None, customer_id=None):
             invoice.order_no = cart
             invoice.save()
             invoice = Invoices.salesInvoice.objects.get(id=invoice.id)
+            cart.paid_status = 5
+            cart.save()
         except:
             context["errors"]= "Error in Details of Invoice"
             return(request, 'cashflow/invoice.html', context)
