@@ -9,9 +9,12 @@ admin.site.unregister(User)
 class UserTypeInline( admin.StackedInline ):
     model = apps.get_model('users', model_name="UserType")
 
+class UserSystemInline( admin.StackedInline ):
+    model = apps.get_model('users', model_name="UserSystem")
+
 
 class UserAdmin(BaseUserAdmin):
-    inlines=(UserTypeInline, )
+    inlines=(UserTypeInline, UserSystemInline)
     extra = 1
 
 admin.site.register(User, UserAdmin)

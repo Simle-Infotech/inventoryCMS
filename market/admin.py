@@ -10,22 +10,6 @@ from market import models as Markets
 
 from django.utils.html import format_html
 from django.urls import reverse, resolve
-# from django.conf import settings
-# from django.contrib.auth.models import User, Group
-# from inline_actions.admin import InlineActionsMixin
-# from django.shortcuts import redirect
-# from django.utils.translation import ugettext_lazy as _
-# from django.utils.safestring import mark_safe
-# from nepali_date.date import NepaliDate
-# from django.db.models import Sum, Q, F, Value
-
-
-# class ContactPersonInline(admin.StackedInline):
-#     model = apps.get_model('accounts', model_name='Person')
-#     show_change_link = True
-#     exclude = ('contact_person',)
-#     fields = ['nepali_date', 'amount', 'payment_mode', 'nep_date', 'date', 'term']
-#     readonly_fields = ['nep_date',]
 
 class ItemsCartAdmin(admin.TabularInline):
     model = apps.get_model('market', model_name="ShoppingItems")
@@ -78,13 +62,13 @@ class ShoppingCartAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj):
         order_invoices = Invoices.salesInvoice.objects.filter(order_no = obj)
         if order_invoices.count() == 0 and not request.user.is_superuser:
-            return []
-        return ['invoice',]
+            return ['add_items']
+        return ['invoice', 'add_items']
         # return excludes
     
     def get_list_display(self, request):
         if request.user.is_superuser:
-            return ['customer', 'paid_status']
+            return ['customer', 'paid_status', 'cart_created']
 
         return self.list_display
     
@@ -106,6 +90,11 @@ class ShoppingCartAdmin(admin.ModelAdmin):
             obj.customer = request.user.usertype.belongs_to_customer
         obj.clean()
         obj.save()
+    
+    def add_items(self, obj):
+        href = "<a href=\"#shopping-itemss-tab\"> Add Items to the list </a>"
+        return format_html(href)
+        
     
     def invoice(self, obj):
         if obj.id is None:

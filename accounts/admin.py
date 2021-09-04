@@ -20,12 +20,12 @@ register_models = ['Dealer', "Person"]
     # readonly_fields = ['nep_date',]
 
 
-@admin.register(apps.get_model('accounts', model_name='Customer'))
-class CustomerAdmin(admin.ModelAdmin):
-    model = apps.get_model('accounts', model_name='Customer')
-    ordering = ('name',)
-    list_display = ['name', 'phone', 'pan', 'address']
-    # inlines = [ContactPersonInline,]
+# @admin.register(apps.get_model('accounts', model_name='Customer'))
+# class CustomerAdmin(admin.ModelAdmin):
+#     model = apps.get_model('accounts', model_name='Customer')
+#     ordering = ('name',)
+#     list_display = ['name', 'phone', 'pan', 'address']
+#     # inlines = [ContactPersonInline,]
 
 
 for x in register_models:

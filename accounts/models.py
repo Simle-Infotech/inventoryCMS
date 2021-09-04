@@ -27,7 +27,10 @@ class CustomerMeta(models.Model):
 
 
 class Dealer(CustomerMeta):
-    pass
+    is_of_type = models.IntegerField(choices=(
+        (1, "Normal"),
+        (2, "Owner")
+    ), default=1)
 
 
 class Customer(CustomerMeta):
@@ -66,3 +69,11 @@ class Customer(CustomerMeta):
                 sum(self.salesinvoice_set.all().values_list("to_pay", flat=True)) - \
                 sum(self.payment_set.all().values_list('amount', flat=True)),
             2)
+    
+    @property 
+    def arthik_pending(self):
+        return 'NPR {:,.2f}'.format(self.arthik_remaining_pay,)
+    
+    @property
+    def pay_due(self):
+        return 'NPR {:,.2f}'.format(self.remaining_pay(),)

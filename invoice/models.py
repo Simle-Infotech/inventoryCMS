@@ -32,8 +32,10 @@ class salesInvoice(InvoiceMeta):
                 return self.total
     
     def save(self, *args, **kwargs):
-        if self.vat_bill_no != None:
+        if self.bill_no is not None:
             self.is_vat = True
+        else:
+            self.is_vat = False
         super(salesInvoice, self).save(*args, **kwargs)
 
 

@@ -33,7 +33,8 @@ urlpatterns = [
     path('data', api.generalModelViewSet.as_view()),
     re_path('^inbox/notifications/', include(notifications_urls, namespace='notifications')),
     path('appuser/notifications', include('market.urls')),
-    path('appuser/cash', include('invoice.urls'))
+    path('appuser/cash', include('invoice.urls')),
+    path('appuser/cashflow', include('cashflow.urls')),
 ] 
 
 router.register(r'images', api.ImageViewSet)

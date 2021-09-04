@@ -54,7 +54,7 @@ class OpeningBalanceMeta(models.Model):
         else:
             if self.amount == 0:
                 self.amount = self.account.remaining_pay()
-            super(OpeningBalance, self).save(*args, **kwargs)
+            super(OpeningBalanceMeta, self).save(*args, **kwargs)
 
     class Meta:
         unique_together = ('account', 'term')
@@ -69,7 +69,7 @@ class OpeningBalanceMeta(models.Model):
         return self.term.end_date
 
     def invoices(self):
-        return self.account.invoice_set.filter(
+        return self.account.salesinvoice_set.filter(
                 date__range=[self.term.start_date, self.term.end_date]
             )
 
@@ -80,7 +80,7 @@ class OpeningBalanceMeta(models.Model):
 
     @property
     def closing_due(self):
-        return sum(self.account.invoice_set.filter(
+        return sum(self.account.salesinvoice_set.filter(
                 date__range=[self.term.start_date, self.term.end_date]
             ).values_list("to_pay", flat=True)) - \
             sum(self.account.payment_set.filter(
@@ -90,7 +90,7 @@ class OpeningBalanceMeta(models.Model):
 
     @property
     def total_sales(self):
-        return sum(self.account.invoice_set.filter(
+        return sum(self.account.salesinvoice_set.filter(
                 date__range=[self.term.start_date, self.term.end_date]
             ).values_list("to_pay", flat=True))
 
@@ -102,7 +102,15 @@ class OpeningBalanceMeta(models.Model):
 
 
 class OpeningBalance(OpeningBalanceMeta):
-    pass
+    def payments_until(self, end_date):
+        return self.account.payment_set.filter(
+            (Q(date__range=[self.term.start_date, end_date]) & Q(term__isnull = True)) | Q(term = self.term)
+        ).values_list('amount', flat=True)
+    
+    def sales_until(self, end_date):
+        return self.account.salesinvoice_set.filter(
+                date__range=[self.term.start_date, end_date]
+            ).values_list("to_pay", flat=True)
 
 
 class OpeningBalanceDealer(OpeningBalanceMeta):

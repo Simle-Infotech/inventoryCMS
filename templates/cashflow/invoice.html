@@ -115,7 +115,7 @@
 				<input id="order_id" type="hidden" value={{order.id}}>
 				<tr>
 					<th><span contenteditable>Vat Bill No.</span></th>
-					<td colspan="2"><input id="vat_no" value="{{invoice.vat_bill_no | default_if_none:''}}" /></td>
+					<td colspan="2"><input id="vat_no" value="{{invoice.bill_no | default_if_none:''}}" /></td>
 				</tr>
 				<tr>
 					<th><span contenteditable>Due Amount</span></th>

@@ -24,3 +24,5 @@ django-rest-knox
 django-select2
 django-easy-select2
 django-notifications-hq
+pandas
+nepali_datetime

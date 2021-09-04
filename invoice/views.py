@@ -70,7 +70,7 @@ def invoice(request, order_id=None, id=None, customer_id=None):
             invoice.to_pay = invoiceDetails['to_pay']
             invoice.notes = invoiceDetails['notes']
             invoice.is_posted = True
-            invoice.vat_bill_no = invoiceDetails['vat']
+            invoice.bill_no = invoiceDetails['vat']
             invoice.order_no = cart
             invoice.save()
             invoice = Invoices.salesInvoice.objects.get(id=invoice.id)
