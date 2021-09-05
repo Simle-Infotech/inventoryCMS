@@ -5,7 +5,7 @@ from django.utils import timezone
 
 
 class openingInventory(models.Model):
-    product = models.ForeignKey('products.Item', on_delete=models.CASCADE)
+    product = models.ForeignKey('products.ItemColorAvailability', on_delete=models.CASCADE)
     opening_qty = models.FloatField("Opening Quantity")
     rate = models.FloatField("Opening Rate")
     expiry = models.DateField("Expiry Date")

@@ -36,7 +36,7 @@ class ShoppingCart(models.Model):
         # self.total_tax = self.get_total_tax
         # logger.info(str(model_to_dict(self)))
         if self.paid_status != 1:
-            notify.send(sender=User.objects.filter(is_superuser=True).first() ,recipient=self.customer.usertype_set.get().user, target=self, verb="Order", description=dict(self.paid_choices)[self.paid_status])
+            notify.send(sender=User.objects.filter(is_superuser=True).first(), recipient=self.customer.usertype_set.get().user, target=self, verb="Order", description=dict(self.paid_choices)[self.paid_status])
             super(ShoppingCart, self).save(*args, **kwargs)
             return True
         
@@ -44,8 +44,8 @@ class ShoppingCart(models.Model):
             super(ShoppingCart, self).save(*args, **kwargs)
             notify.send(self.customer.usertype_set.get().user, recipient=User.objects.filter(is_superuser=True), verb="Order", description="Order Modified %s " % self.id, target=self)
         else:
-            super(ShoppingCart, self).save(*args, **kwargs)
-            notify.send(self.customer.usertype_set.get().user, recipient=User.objects.filter(is_superuser=True), verb="Order", description="Order Created %s " % self.customer.name, target=self)
+            cart = super(ShoppingCart, self).save(*args, **kwargs)
+            notify.send(cart.customer.usertype_set.get().user, recipient=User.objects.filter(is_superuser=True), verb="Order", description="Order Created %s " % self.customer.name, target=self)
             
         return True
 
