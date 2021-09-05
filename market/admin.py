@@ -92,10 +92,7 @@ class ShoppingCartAdmin(admin.ModelAdmin):
         obj.save()
     
     def add_items(self, obj):
-        if obj.id:
-            href = "<a href=\"https://family.simle.com.np/app/market/shoppingcart/%s/change/#shopping-itemss-tab\"> Add Items to the list </a>" % obj.id
-        else:
-            href = "<a href=\"https://family.simle.com.np/app/market/shoppingcart/add/#shopping-itemss-tab\""
+        href = "<a href=\"#shopping-itemss-tab\"> Add Items to the list </a>"
         return format_html(href)
         
     
