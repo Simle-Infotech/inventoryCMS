@@ -86,7 +86,7 @@ class ShoppingCartAdmin(admin.ModelAdmin):
         return qs.filter(customer=request.user.usertype.belongs_to_customer)
 
     def save_model(self, request, obj, form, change):
-        if not obj.id and request.user.is_superuser:
+        if not obj.id:
             obj.customer = request.user.usertype.belongs_to_customer
         obj.clean()
         obj.save()

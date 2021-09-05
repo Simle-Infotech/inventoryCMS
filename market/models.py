@@ -26,7 +26,7 @@ class ShoppingCart(models.Model):
     cart_created = models.DateTimeField(auto_now_add=True )
 
     def __str__(self):
-        if self.description != "":
+        if self.description is not None:
             return self.description
         else:
             return "%s : Cart" % (self.id)
@@ -47,7 +47,7 @@ class ShoppingCart(models.Model):
             super(ShoppingCart, self).save(*args, **kwargs)
             notify.send(self.customer.usertype_set.get().user, recipient=User.objects.filter(is_superuser=True), verb="Order", description="Order Created %s " % self.customer.name, target=self)
             
-        return True
+        # return True
 
     
     # @property
