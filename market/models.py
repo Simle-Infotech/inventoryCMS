@@ -44,8 +44,8 @@ class ShoppingCart(models.Model):
             super(ShoppingCart, self).save(*args, **kwargs)
             notify.send(self.customer.usertype_set.get().user, recipient=User.objects.filter(is_superuser=True), verb="Order", description="Order Modified %s " % self.id, target=self)
         else:
-            cart = super(ShoppingCart, self).save(*args, **kwargs)
-            notify.send(cart.customer.usertype_set.get().user, recipient=User.objects.filter(is_superuser=True), verb="Order", description="Order Created %s " % self.customer.name, target=self)
+            super(ShoppingCart, self).save(*args, **kwargs)
+            notify.send(self.customer.usertype_set.get().user, recipient=User.objects.filter(is_superuser=True), verb="Order", description="Order Created %s " % self.customer.name, target=self)
             
         return True
 
