@@ -137,12 +137,12 @@ function updateInvoice() {
 		// get inventory row cells
 		cells = a[i].querySelectorAll('span:last-child');
     cells[0].innerHTML = i + 1;
+	y = cells[2].children;
         j = 1
 		price = parseFloatHTML(cells[2 + j]) * parseFloatHTML(cells[3 + j]);
 		// add price to total
 		total += price;
     if (cells[5 + j].innerText.toUpperCase() == 'X'){
-      console.log(price,taxable);
       if (cells[6 + j].innerText.toUpperCase() == "X"){
         tax = price / 1.13 * .13;
         taxable += tax;
@@ -190,7 +190,6 @@ function updateInvoice() {
 	invoice['tax'] = taxable
 	invoice['discount'] = parseFloatHTML(cells[4])
 	invoice['to_pay'] = invoice['total'] - invoice['paid'] - invoice['discount']
-	console.log(items_obj, invoice)
 	document.getElementById('invoice').value = JSON.stringify(invoice);
 	document.getElementById('items').value = JSON.stringify(items_obj);
 	

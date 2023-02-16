@@ -55,6 +55,9 @@ class ItemColorAvailability(models.Model):
     
     class Meta:
         unique_together = ['item', 'color']
+    
+    def get_expiring_items(self):
+        pass
 
 
 class Image(models.Model):

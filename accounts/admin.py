@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from nepali_date.date import NepaliDate
 
-register_models = ['Dealer', "Person"]
+register_models = ["Person"]
 
 # class ContactPersonInline(admin.StackedInline):
 #     model = apps.get_model('accounts', model_name='Person')
@@ -20,12 +20,12 @@ register_models = ['Dealer', "Person"]
     # readonly_fields = ['nep_date',]
 
 
-# @admin.register(apps.get_model('accounts', model_name='Customer'))
-# class CustomerAdmin(admin.ModelAdmin):
-#     model = apps.get_model('accounts', model_name='Customer')
-#     ordering = ('name',)
-#     list_display = ['name', 'phone', 'pan', 'address']
-#     # inlines = [ContactPersonInline,]
+@admin.register(apps.get_model('accounts', model_name='Dealer'))
+class DealerAdmin(admin.ModelAdmin):
+    model = apps.get_model('accounts', model_name='Dealer')
+    ordering = ('name',)
+    list_display = ['name', 'phone', 'pan', 'address']
+    # inlines = [ContactPersonInline,]
 
 
 for x in register_models:
